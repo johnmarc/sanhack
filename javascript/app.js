@@ -217,8 +217,6 @@ var active = 'report-tab';
 
   $(function () {
 
-    addMap();
-    doPoll();
     $('#report-tab-content').show();
     $('ul.nav li').click(function(){
       if ($(this).attr('id') != active){
@@ -229,6 +227,9 @@ var active = 'report-tab';
         $('#'+active+'-content').show();
       }
     })
+    
+    addMap();
+    doPoll();
   });
 
 }(window.jQuery);
