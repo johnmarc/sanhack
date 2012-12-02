@@ -154,7 +154,7 @@ function addMap(){
     addMap();
     var st = $('#overview-list').first();
     sqlapi = new cartodb.SQL({ user: 'sanhack' });
-    sqlapi.execute("SELECT school, phone, class_size, females, (SELECT array_agg(attendance_f ORDER BY sent_at) FROM daily_class_count WHERE phone = pr.phone) as attendance_f, (SELECT array_agg((sent_at::date)::text ORDER BY sent_at) FROM daily_class_count WHERE phone = pr.phone) as sent_at FROM phone_registration pr ORDER BY (SELECT count(*) FROM daily_class_count WHERE phone = pr.phone) DESC")
+    sqlapi.execute("SELECT school, phone, class_size, females, (SELECT array_agg(attendance_f ORDER BY created_at) FROM daily_class_count WHERE phone = pr.phone) as attendance_f, (SELECT array_agg((created_at::date)::text ORDER BY created_at) FROM daily_class_count WHERE phone = pr.phone) as created_at FROM phone_registration pr ORDER BY (SELECT count(*) FROM daily_class_count WHERE phone = pr.phone) DESC")
       .done(function(data) {
         console.log(data)
         for (var i = 0; i < data.rows.length; i++){
@@ -173,7 +173,7 @@ function addMap(){
           if (data.rows[i].attendance_f != null){
             var k = [];
             for (var j = 0; j < data.rows[i].attendance_f.length; j++){
-              var jj = data.rows[i].sent_at[j].split('-');
+              var jj = data.rows[i].created_at[j].split('-');
               var dd = Date.UTC(jj[0],  jj[1], jj[2]);
               k.push([dd, data.rows[i].attendance_f[j]])
             }

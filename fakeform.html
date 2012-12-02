@@ -19,7 +19,11 @@ SanHack Reporting
          function getFakeMsg(){
           var m =  Math.floor(25*Math.random()) + "m";
           var f =  Math.floor(25*Math.random()) + "f";
-          $('#msg').val(f+" "+m)
+          if (Math.random() < 0.2){
+            $('#msg').val("Good morning!")
+          } else{
+            $('#msg').val(f+" "+m)
+          }
          }
          function form1Submit() {
           var num= encodeURIComponent($('#num').val());
