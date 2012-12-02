@@ -13,8 +13,14 @@ function submit_sql($sql) {
 }
 
 function log_raw_message() {
-	$number = $_GET['num'];
-	$message = $_GET['msg'];
+	if(isset($_GET['msg']) && isset($_GET['num'])) {
+		$message = $_GET['msg'];
+		$number = $_GET['num'];
+	}
+	if(isset($_GET['SmsStatus'])) {
+		$number = $_GET['From'];
+		$message = $_GET['Body'];
+	}
 
 	$raw_msg_insert_sql = "INSERT INTO message_logs (message, phone) VALUES ( '$number', '$message' )";
 	$values = submit_sql($raw_msg_insert_sql); 
@@ -26,7 +32,14 @@ function log_raw_message() {
 
 //Returns true if we already know the sender
 function known_phone() {
-	$number = $_GET['num'];
+	if(isset($_GET['msg']) && isset($_GET['num'])) {
+		$message = $_GET['msg'];
+		$number = $_GET['num'];
+	}
+	if(isset($_GET['SmsStatus'])) {
+		$number = $_GET['From'];
+		$message = $_GET['Body'];
+	}
 	$raw_sql = "SELECT * FROM phone_registration WHERE phone = '$number'";
 	$values = submit_sql($raw_sql);
 
@@ -70,10 +83,25 @@ function insert_attendance($count_m, $count_f, $number) {
 	return false;
 }
 
+function send_sms($number, $message) {
+	$auth_token = file_get_contents("twilio.txt");
+	$curl = "curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACc8d605ab20ee83c7ddb4d26cb615b6eb/SMS/Messages.json' -d 'From=%2B13476479041' "
+	. "-d 'To=" . urlencode($number) .  "' -d 'Body=" . urlencode($message) . "' -u ACc8d605ab20ee83c7ddb4d26cb615b6eb:" . $auth_token;
+	error_log($curl);
+	$json = exec($curl);
+	error_log(print_r($json, true));
+}
+
 
 function parse_message() {
-	$message = $_GET['msg'];
-	$number = $_GET['num'];
+	if(isset($_GET['msg']) && isset($_GET['num'])) {
+		$message = $_GET['msg'];
+		$number = $_GET['num'];
+	}
+	if(isset($_GET['SmsStatus'])) {
+		$number = $_GET['From'];
+		$message = $_GET['Body'];
+	}
 	if ( is_numeric($message)) {
 		$success = insert_attendance(null, $message, $number);
 	} else {
@@ -124,13 +152,16 @@ function parse_message() {
 	if (!$success) {
 		//send_error_reply();
 		print "I was unable to understand your message\n<br>";
+		send_sms($number, "I was unable to understand your message");
 	} else {
 	
 		if (!known_phone()) {
 			print "Please tell me who you are\n<br>";
+			send_sms($number, "Please tell me who you are");
 			//send_who_are_you()	
 		} else {
 			print "Thanks for your report!\n<br>";
+			send_sms($number, "Thanks for your report!");
 			//send_thanks()
 		}	
 	}
