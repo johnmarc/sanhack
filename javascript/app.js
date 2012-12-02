@@ -103,7 +103,7 @@ function addMap(){
     //add our main layer
     cartodb.createLayer(map, 'http://sanhack.cartodb.com/api/v1/viz/13360/viz.json', {
       query:  'SELECT  \
-               cartodb_id,\
+               cartodb_id,'+ Math.random() +' as breaker, \
                the_geom_webmercator,\
                the_geom,\
                phone,\
@@ -116,15 +116,15 @@ function addMap(){
                 marker-allow-overlap: true;\
                 marker-placement: point;\
                 marker-type: ellipse;\
-                marker-width: 56;\
+                marker-width: 35;\
                 marker-line-width: 1;\
                 marker-line-color: #FFF;\
                 marker-line-opacity: 1;\
-                [bubble_size <= 5]{marker-width: 48;}\
-                [bubble_size <= 4]{marker-width: 40;}\
-                [bubble_size <= 3]{marker-width: 32;}\
-                [bubble_size <= 2]{marker-width: 24;}\
-                [bubble_size <= 1]{marker-width: 18;}\
+                [bubble_size <= 15]{marker-width: 30;}\
+                [bubble_size <= 11]{marker-width: 25;}\
+                [bubble_size <= 8]{marker-width: 20;}\
+                [bubble_size <= 3]{marker-width: 15;}\
+                [bubble_size <= 1]{marker-width: 10;}\
               }',
       interactivity: false
     })
