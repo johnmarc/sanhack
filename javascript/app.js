@@ -21,6 +21,7 @@ var map;
 var sqlapi;
 var chart;
 
+
 function addBarChart(containerName, data){
 chart = new Highcharts.Chart({
             chart: {
@@ -56,37 +57,10 @@ chart = new Highcharts.Chart({
                 // of 1970/71 in order to be compared on the same x axis. Note
                 // that in JavaScript, months start at 0 for January, 1 for February etc.
                 data: data
-                // [
-                //     [Date.UTC(1970,  9, 27), 0   ],
-                //     [Date.UTC(1970, 10, 10), 0.6 ],
-                //     [Date.UTC(1970, 10, 18), 0.7 ],
-                //     [Date.UTC(1970, 11,  2), 0.8 ],
-                //     [Date.UTC(1970, 11,  9), 0.6 ],
-                //     [Date.UTC(1970, 11, 16), 0.6 ],
-                //     [Date.UTC(1970, 11, 28), 0.67],
-                //     [Date.UTC(1971,  0,  1), 0.81],
-                //     [Date.UTC(1971,  0,  8), 0.78],
-                //     [Date.UTC(1971,  0, 12), 0.98],
-                //     [Date.UTC(1971,  0, 27), 1.84],
-                //     [Date.UTC(1971,  1, 10), 1.80],
-                //     [Date.UTC(1971,  1, 18), 1.80],
-                //     [Date.UTC(1971,  1, 24), 1.92],
-                //     [Date.UTC(1971,  2,  4), 2.49],
-                //     [Date.UTC(1971,  2, 11), 2.79],
-                //     [Date.UTC(1971,  2, 15), 2.73],
-                //     [Date.UTC(1971,  2, 25), 2.61],
-                //     [Date.UTC(1971,  3,  2), 2.76],
-                //     [Date.UTC(1971,  3,  6), 2.82],
-                //     [Date.UTC(1971,  3, 13), 2.8 ],
-                //     [Date.UTC(1971,  4,  3), 2.1 ],
-                //     [Date.UTC(1971,  4, 26), 1.1 ],
-                //     [Date.UTC(1971,  5,  9), 0.25],
-                //     [Date.UTC(1971,  5, 12), 0   ]
-                // ]
             }]
         });
 }
-
+var selected = null;
 function addMap(){
     map = L.map('map_main', { 
       zoomControl: false,
@@ -106,11 +80,18 @@ function addMap(){
                cartodb_id,'+ Math.random() +' as breaker, \
                the_geom_webmercator,\
                the_geom,\
-               phone,\
+               phone,school,\
                class_size,\
                (SELECT count(*) FROM daily_class_count WHERE phone = pr.phone) as bubble_size \
               FROM phone_registration pr',
-      tile_style: '#{{table_name}}{\
+      tile_style: "#{{table_name}}{\
+                text-name: '[school]';\
+                text-face-name: 'DejaVu Sans Book';\
+                text-vertical-alignment: top;\
+                text-dy: -15;\
+                text-halo-fill: #959ea4;\
+                text-halo-radius: 1;\
+                text-size: 15;\
                 marker-fill: #FF5C00;\
                 marker-opacity: 0.8;\
                 marker-allow-overlap: true;\
@@ -125,14 +106,21 @@ function addMap(){
                 [bubble_size <= 8]{marker-width: 20;}\
                 [bubble_size <= 3]{marker-width: 15;}\
                 [bubble_size <= 1]{marker-width: 10;}\
-              }',
-      interactivity: false
+              }",
+      //interactivity: false
     })
      .on('done', function(layer) {
       map.addLayer(layer);
 
-      layer.on('featureOver', function(e, pos, latlng, data) {
-        cartodb.log.log(e, pos, latlng, data);
+      layer.on('featureClick', function(e, pos, latlng, data) {
+        $(".bar-row").each(function(){
+            $(this).removeClass('selected');
+            selected = data.cartodb_id;
+          if ($(this).attr('id') == data.cartodb_id){
+            $(this).prependTo(this.parentNode);
+            $(this).addClass('selected');
+          }
+        })
       });
 
       layer.on('error', function(err) {
@@ -146,17 +134,14 @@ function addMap(){
     console.log(cartodb)
 }
 
-!function ($) {
 
+function runSQL(){
 
-  $(function () {
-
-    addMap();
     var st = $('#overview-list').first();
     sqlapi = new cartodb.SQL({ user: 'sanhack' });
-    sqlapi.execute("SELECT school, phone, class_size, females, (SELECT array_agg(attendance_f ORDER BY created_at) FROM daily_class_count WHERE phone = pr.phone) as attendance_f, (SELECT array_agg((created_at::date)::text ORDER BY created_at) FROM daily_class_count WHERE phone = pr.phone) as created_at FROM phone_registration pr ORDER BY (SELECT count(*) FROM daily_class_count WHERE phone = pr.phone) DESC")
+    sqlapi.execute("SELECT cartodb_id,school, phone, class_size, females, (SELECT array_agg(attendance_f ORDER BY created_at) FROM daily_class_count WHERE phone = pr.phone) as attendance_f, (SELECT array_agg((created_at::date)::text ORDER BY created_at) FROM daily_class_count WHERE phone = pr.phone) as created_at FROM phone_registration pr ORDER BY (SELECT count(*) FROM daily_class_count WHERE phone = pr.phone) DESC")
       .done(function(data) {
-        console.log(data)
+        st.empty();
         for (var i = 0; i < data.rows.length; i++){
           var d2 = $('<div>').attr('class','span12'),
               p = $('<span>').attr('class','span3'),
@@ -168,8 +153,18 @@ function addMap(){
           d2.append(p);
           d2.append(c);
           var d = $('<div>').attr('class','row bar-row');
+          d.attr('id',data.rows[i].cartodb_id)
           d.append(d2);
-          st.append(d);
+          if (selected == null){
+            st.append(d);
+          } else {
+            if (selected == data.rows[i].cartodb_id) {
+              d.addClass('selected')
+              st.prepend(d);
+            } else {
+              st.append(d);
+            }
+          }
           if (data.rows[i].attendance_f != null){
             var k = [];
             for (var j = 0; j < data.rows[i].attendance_f.length; j++){
@@ -179,17 +174,63 @@ function addMap(){
             }
             addBarChart(cid, k );
           }
-          console.log(data.rows[i])
         }
-        console.log(data.rows);
       })
       .error(function(errors) {
         // errors contains a list of errors
         console.log("error:" + err);
       })
 
+}
+
+var latest = null;
+function getLatest(){
+    var latestSql = new cartodb.SQL({ user: 'sanhack' });
+    latestSql.execute("SELECT max(extract(epoch FROM updated_at)) as max FROM daily_class_count")
+    .done(function(data) {
+      latest = data.rows[0].max + 1; //dunno why i needed to add 1 second
+      console.log(latest)
+    });
+}
+function doPoll(){
+  
+  if (latest == null){ 
+    runSQL();
+    getLatest();
+          setTimeout(doPoll,5000);
+  } else {
+    var updateSql = new cartodb.SQL({ user: 'sanhack' });
+      updateSql.execute("SELECT count(*) as ct FROM daily_class_count WHERE extract(epoch FROM updated_at) > "+latest+" ")
+        .done(function(data) {
+          if (data.rows[0].ct > 0){
+            console.log(data.rows)
+            runSQL();
+            getLatest();
+          }
+          setTimeout(doPoll,5000);
+        });
+  }
+   
+}
+
+var active = 'report-tab';
+!function ($) {
 
 
+  $(function () {
+
+    addMap();
+    doPoll();
+    $('#report-tab-content').show();
+    $('ul.nav li').click(function(){
+      if ($(this).attr('id') != active){
+        active = $(this).attr('id') ;
+        $('ul.nav li').removeClass('active');
+        $(this).addClass('active');
+        $('.tab').hide();
+        $('#'+active+'-content').show();
+      }
+    })
   });
 
 }(window.jQuery);

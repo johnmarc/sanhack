@@ -12,8 +12,12 @@ SanHack Reporting
          <script src="http://code.highcharts.com/modules/exporting.js"></script>
          <script src="javascript/app.js"></script>
          <style>
-            .map {height: 380px; width: 100%; margin: 20 0 0 0; padding: 0; border: 12px solid black;}
+            .tab {display: none;}
+            .navbar {height: 30px; margin-bottom: 5px;}
+            .brand img{height: 30px; margin: 0; padding: 0;}
+            .map {height: 380px; width: 100%; margin: 25 0 0 0; padding: 0; border: 12px solid black;}
             .bar-row {height: 100px; border-bottom: 4px solid black; padding: 0; margin: 0;}
+            .bar-row.selected{color: red;}
             .bar-row .chart{height: 100%;}
             #overview-list {position: relative;}
             #overview-list .school-block { margin-top: 5px; font-size: 1.5em; font-weight: 700; position: relative; float: left; width: 100%;}
@@ -29,25 +33,31 @@ SanHack Reporting
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">World Bank Attendance Report</a>
+          <a class="brand" href="#"><img src='img/schoolhack-inverse.png' /></a><!-- 
+          <a class="brand" href="#">SchoolTrack: World Bank Attendance Report</a> -->
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active"><a href="#">Report</a></li>
+              <li class="active" id='report-tab'><a href="#">Report</a></li>
               <li><a href="#Data">Data</a></li>
+            </ul>
           </div><!--/.nav-collapse -->
         </div>
       </div>
     </div>
 
 <div class="container">
-    <div class="tab">
-        <label for="tab-1" id="report"></label>   
-        <div class="content"> Forms<br />
-	</div>
+
+    <div class="tab" id="about-tab-content">
+        <label for="tab-2" id="data"></label>
+        <div class="content"> 
+          <div class="row-fluid">
+              <div class="span12">hi</div>
+          </div>
+        </div>
     </div>
 
 
-    <div class="tab">
+    <div class="tab" id="report-tab-content">
         <label for="tab-2" id="data"></label>
         <div class="content"> 
           <div class="row-fluid">
