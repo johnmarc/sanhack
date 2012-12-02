@@ -4,6 +4,8 @@
         <title>
 SanHack Reporting
         </title>
+        <link href='http://fonts.googleapis.com/css?family=Arvo:400,700' rel='stylesheet' type='text/css'>
+
          <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
          <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v2/themes/css/cartodb.css" />
          <script src="http://libs.cartocdn.com/cartodb.js/v2/cartodb.js"></script>
@@ -12,9 +14,15 @@ SanHack Reporting
          <script src="http://code.highcharts.com/modules/exporting.js"></script>
          <script src="javascript/app.js"></script>
          <style>
+            body{padding-bottom: 40px;}
             .tab {display: none;}
+            .about-text{margin-top: 80px; font-family: 'Arvo', serif;
+                font-size: 24px; line-height:36px; text-align: justify;}
+            .girls-img{margin-top: 70px;}
+            .group-img{margin-top: 40px;}
             .navbar {height: 30px; margin-bottom: 5px;}
             .brand img{height: 30px; margin: 0; padding: 0;}
+            .break {height: 10px; background: black;}
             .map {height: 380px; width: 100%; margin: 25 0 0 0; padding: 0; border: 12px solid black;}
             .bar-row {height: 100px; border-bottom: 4px solid black; padding: 0; margin: 0;}
             .bar-row.selected{color: red;}
@@ -38,7 +46,7 @@ SanHack Reporting
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="active" id='report-tab'><a href="#">Report</a></li>
-              <li><a href="#Data">Data</a></li>
+              <li id='about-tab'><a href="#">About</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -51,7 +59,31 @@ SanHack Reporting
         <label for="tab-2" id="data"></label>
         <div class="content"> 
           <div class="row-fluid">
-              <div class="span12">hi</div>
+              <div class="about-text span5">
+                <p>1 in 10 girls in Africa miss class or drop out of school when they hit puberty, at 10-12 years old.
+                Why: lack of private facilities, education and teasing
+                GDP increases by .03% for every year a girl goes to school
+                 </p>
+              </div>
+              <img class='span7 girls-img' src='img/girls.png' />
+          </div>
+          <div class="row-fluid">
+              <div class="about-text span12">
+               <p>
+              The World Bank plans to implement a project in Cameroon to increase attendance among girls through the construction of sanitation facilities with private sinks and women’s health education. 
+              Will this increase the number of girls in schools?
+               </p><p>
+              An SMS-based solution for class representatives to report attendance by gender.
+              Allowing the World Bank to track if their project has an impact on girls’ attendance.</p>
+              </div>
+          </div>
+          <span class="break span12"></span>
+          <div class="row-fluid">
+              <div class="about-text span6">
+                <p>SchoolTrack was developed over 1 1/2 days as part of the Sanitation Hackathon in NYC. <a href='http://www.sanitationhackathon.org/school-track'>Click here</a> to see more about the project and the our team.
+                 </p>
+              </div>
+              <img class='span6 group-img' src='img/group.jpg' />
           </div>
         </div>
     </div>

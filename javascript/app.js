@@ -130,8 +130,6 @@ function addMap(){
     }).on('error', function() {
       cartodb.log.log("some error occurred");
     });
-
-    console.log(cartodb)
 }
 
 
