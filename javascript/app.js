@@ -35,7 +35,7 @@ chart = new Highcharts.Chart({
             xAxis: {
                 type: 'datetime',
                 dateTimeLabelFormats: { // don't display the dummy year
-                    month: '%e. %b',
+                    month: '%b %e',
                     year: '%b'
                 }
             },
@@ -45,13 +45,13 @@ chart = new Highcharts.Chart({
             },
             tooltip: {
                 formatter: function() {
-                        return '<b>'+ this.series.name +'</b><br/>'+
-                        Highcharts.dateFormat('%e. %b', this.x) +': '+ this.y +' m';
+                        return '<b>'+Highcharts.dateFormat('%b %e', this.x) +'</b><br/>'+
+                        this.y +' girls';
                 }
             },
             
             series: [{
-                name: 'Winter 2007-2008',
+                name: 'Attendance rate',
                 showInLegend: false,
                 // Define the data points. All series have a dummy year
                 // of 1970/71 in order to be compared on the same x axis. Note
@@ -167,9 +167,10 @@ function runSQL(){
             var k = [];
             for (var j = 0; j < data.rows[i].attendance_f.length; j++){
               var jj = data.rows[i].created_at[j].split('-');
-              var dd = Date.UTC(jj[0],  jj[1], jj[2]);
+              var dd = Date.UTC(jj[0],  jj[1]-1, jj[2]);
               k.push([dd, data.rows[i].attendance_f[j]])
             }
+            console.log(cid, k)
             addBarChart(cid, k );
           }
         }
@@ -187,7 +188,6 @@ function getLatest(){
     latestSql.execute("SELECT max(extract(epoch FROM updated_at)) as max FROM daily_class_count")
     .done(function(data) {
       latest = data.rows[0].max + 1; //dunno why i needed to add 1 second
-      console.log(latest)
     });
 }
 function doPoll(){
@@ -201,7 +201,6 @@ function doPoll(){
       updateSql.execute("SELECT count(*) as ct FROM daily_class_count WHERE extract(epoch FROM updated_at) > "+latest+" ")
         .done(function(data) {
           if (data.rows[0].ct > 0){
-            console.log(data.rows)
             runSQL();
             getLatest();
           }
@@ -227,7 +226,7 @@ var active = 'report-tab';
         $('#'+active+'-content').show();
       }
     })
-    
+
     addMap();
     doPoll();
   });
